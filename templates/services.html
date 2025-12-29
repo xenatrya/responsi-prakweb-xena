@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Layanan Grooming{% endblock %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    :root{
+        --green-dark: #2D7A4D;
+        --green-bg: rgba(45,122,77,0.06);
+        --green-border: rgba(45,122,77,0.25);
+    }
+
+    .services-wrapper { padding-top: 12px; }
+
+    .service-card {
+        background: var(--green-bg);
+        border: 2px solid var(--green-border);
+        border-radius: 14px;
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .service-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 28px rgba(30,90,50,0.08);
+    }
+
+    .service-title {
+        color: var(--green-dark);
+        font-weight: 800;
+        font-size: 1.45rem;
+        margin-bottom: 8px;
+    }
+
+    .service-desc {
+        color: rgba(0,0,0,0.65);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    /* boxed description per service */
+    .service-desc-box {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.06);
+        padding: 12px;
+        border-radius: 10px;
+        color: rgba(0,0,0,0.75);
+        min-height: 72px;
+        box-shadow: 0 6px 18px rgba(16,40,30,0.03);
+        margin-bottom: 12px;
+        overflow: auto;
+    }
+
+    .service-footer {
+        display:flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+    }
+
+    .service-price {
+        color: var(--green-dark);
+        font-weight: 800;
+        font-size: 1.2rem;
+    }
+
+    .btn-back {
+        border: 1px solid rgba(0,0,0,0.08);
+        color: var(--green-dark);
+        background: #fff;
+    }
+
+    /* responsive spacing */
+    .services-grid { gap: 22px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="mb-0" style="color:var(--green-dark)">Layanan Grooming</h1>
+        <p class="text-muted">Pilih layanan terbaik untuk hewan kesayangan Anda</p>
+    </div>
+    <div>
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('services_page') }}" class="btn btn-outline-success me-2">Daftar Layanan</a>
+        <a href="{{ url_for('add_service') }}" class="btn btn-success me-2">➕ Tambah Layanan</a>
+        {% endif %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-back">← Kembali</a>
+    </div>
+</div>
+
+<div class="services-wrapper">
+    <div class="row services-grid row-cols-1 row-cols-sm-2 row-cols-md-3">
+        {% for s in services %}
+        <div class="col">
+            <div class="service-card">
+                <div>
+                    <div class="service-title">{{ s.name }}</div>
+                    {% if s.description %}
+                    <div class="service-desc-box"><div class="service-desc">{{ s.description }}</div></div>
+                    {% else %}
+                    <div class="service-desc-box text-muted">Deskripsi belum tersedia.</div>
+                    {% endif %}
+                </div>
+
+                <div class="service-footer">
+                    <div class="service-duration text-muted">{{ s.duration if s.duration else '' }}</div>
+                    <div class="d-flex align-items-center">
+                        <div class="service-price me-2">Rp {{ '{:,.0f}'.format(s.price) }}</div>
+                        {% if current_user.role == 'admin' %}
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary btn-edit-service"
+                                data-id="{{ s.id }}"
+                                data-name="{{ s.name|e }}"
+                                data-price="{{ s.price }}"
+                                data-description="{{ s.description|e }}"
+                                data-duration="{{ s.duration|e }}"
+                                data-bs-toggle="modal" data-bs-target="#editServiceModal">
+                          Edit
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+    <!-- Edit Service Modal -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Layanan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editServiceForm" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Layanan</label>
+                            <input name="name" id="svc-name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Harga</label>
+                            <input name="price" id="svc-price" type="number" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea name="description" id="svc-description" class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Durasi</label>
+                            <input name="duration" id="svc-duration" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        var editModal = document.getElementById('editServiceModal');
+        if (!editModal) return;
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name') || '';
+            var price = button.getAttribute('data-price') || '';
+            var description = button.getAttribute('data-description') || '';
+            var duration = button.getAttribute('data-duration') || '';
+
+            document.getElementById('svc-name').value = name;
+            document.getElementById('svc-price').value = price;
+            document.getElementById('svc-description').value = description;
+            document.getElementById('svc-duration').value = duration;
+
+            var form = document.getElementById('editServiceForm');
+            form.action = '/services/edit/' + id;
+        });
+    });
+    </script>
+{% endblock %}

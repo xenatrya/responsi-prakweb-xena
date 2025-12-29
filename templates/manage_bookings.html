@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Manajemen Booking{% endblock %}
+
+{% block content %}
+<h2>Manajemen Booking Grooming</h2>
+
+<div class="table-responsive">
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>No</th>
+        <th>Nama Hewan</th>
+        <th>Pemilik</th>
+        <th>Jenis</th>
+        <th>Layanan</th>
+        <th>Harga</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for b in data %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ b.nama_hewan }}</td>
+        <td>{{ b.owner_name if b.owner_name else '-' }}</td>
+        <td>{{ b.jenis }}</td>
+        <td>{{ services.get(b.service_id).name if services.get(b.service_id) else '-' }}</td>
+        <td>Rp {{ '{:,.0f}'.format(b.price) }}</td>
+        <td>{{ b.tanggal }}</td>
+        <td>{{ b.jam if b.jam else '-' }}</td>
+        <td>{{ b.status }}</td>
+        <td>
+            {% if current_user.role == 'staff' %}
+                <form action="/update_status/{{ b.id }}" method="post" class="d-inline">
+                    <select name="status" class="form-select form-select-sm d-inline" style="width:auto; display:inline-block;">
+                        <option value="pending" {% if b.status=='pending' %}selected{% endif %}>Pending</option>
+                        <option value="in_progress" {% if b.status=='in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="done" {% if b.status=='done' %}selected{% endif %}>Done</option>
+                        <option value="canceled" {% if b.status=='canceled' %}selected{% endif %}>Canceled</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                </form>
+            {% endif %}
+
+            {% if current_user.role == 'admin' %}
+                <a class="btn btn-sm btn-warning" href="/edit/{{ b.id }}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="/delete/{{ b.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Edit Booking Grooming</h2>
+
+    <form method="post">
+        <div class="mb-2">
+            <label class="form-label">Nama Hewan</label>
+            <input class="form-control" type="text" name="nama" value="{{ booking.nama_hewan }}" required>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Jenis Hewan</label>
+            <input class="form-control" type="text" name="jenis" value="{{ booking.jenis }}" required>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Nama Pemilik</label>
+            <input class="form-control" type="text" name="owner" value="{{ booking.owner_name if booking.owner_name else '' }}" required>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Layanan</label>
+            <select name="service_id" class="form-select">
+                {% for s in services %}
+                <option value="{{ s.id }}" {% if booking.service_id==s.id %}selected{% endif %}>{{ s.name }} - Rp {{ '{:,.0f}'.format(s.price) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Tanggal Grooming</label>
+                <input class="form-control" type="date" name="tanggal" value="{{ booking.tanggal[:10] }}" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Jam Grooming</label>
+                <input class="form-control" type="time" name="jam" value="{{ booking.jam if booking.jam else '' }}">
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Update Data</button>
+        <a class="btn btn-secondary ms-2" href="/dashboard">⬅ Kembali</a>
+    </form>
+</div>
+{% endblock %}

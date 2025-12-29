@@ -1,0 +1,12 @@
+<div class="container">
+    <a href="{{ url_for('logout') }}" class="btn-delete" style="float:right;">Logout</a>
+
+    <h2>Input Data Grooming</h2>
+
+    <form action="{{ url_for('booking') }}" method="post">
+        <input type="text" name="nama" placeholder="Nama Hewan" required>
+        <input type="text" name="jenis" placeholder="Jenis Hewan" required>
+        <input type="date" name="tanggal" required>
+        <button type="submit">Simpan</button>
+    </form>
+</div>

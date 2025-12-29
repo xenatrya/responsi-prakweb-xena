@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Input Booking{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Input Data Grooming</h2>
+
+    <form method="post">
+        <div class="mb-2">
+            <label class="form-label">Pilih Hewan (atau isi untuk tambah baru)</label>
+            <select name="pet_id" class="form-select">
+                <option value=""> Hewan Baru </option>
+                {% for p in pets %}
+                <option value="{{ p.id }}">{{ p.nama }} ({{ p.jenis }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-2">
+            <input class="form-control" type="text" name="nama" placeholder="Nama Hewan (jika baru)">
+        </div>
+        <div class="mb-2">
+            <input class="form-control" type="text" name="jenis" placeholder="Jenis Hewan (jika baru)">
+        </div>
+
+        <div class="mb-2">
+            <input class="form-control" type="text" name="owner" placeholder="Nama Pemilik Hewan" required>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Pilih Layanan</label>
+            <select name="service_id" class="form-select" required>
+                {% for s in services %}
+                <option value="{{ s.id }}">{{ s.name }} - Rp {{ '{:,.0f}'.format(s.price) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Tanggal</label>
+                <input class="form-control" type="date" name="tanggal" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Jam Grooming</label>
+                <input class="form-control" type="time" name="jam" required>
+            </div>
+        </div>
+
+        <button class="btn btn-success" type="submit">Simpan</button>
+        <a class="btn btn-secondary ms-2" href="/dashboard">⬅ Kembali</a>
+    </form>
+</div>
+{% endblock %}
